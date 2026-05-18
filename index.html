@@ -392,11 +392,16 @@ function sendToSlack(name, period, score, total, isPass, isPerfect) {
     + '*全問結果*\n'
     + details
     + '━━━━━━━━━━━━━━━━';
+
   fetch(GAS_URL, {
     method: 'POST',
-    headers: {'Content-Type': 'application/json'},
+    headers: {'Content-Type': 'text/plain'},
     body: JSON.stringify({text: text})
-  }).catch(function(err){ console.log('Slack通知エラー:', err); });
+  }).then(function(res){
+    console.log('Slack通知成功:', res.status);
+  }).catch(function(err){
+    console.log('Slack通知エラー:', err);
+  });
 }
 
 function showResult() {
