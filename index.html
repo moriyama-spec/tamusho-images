@@ -378,7 +378,9 @@ function sendToSlack(name, period, score, total, isPass, isPerfect) {
   var details = '';
   for (var i = 0; i < Q.length; i++) {
     var ok = ans[i] === Q[i].a;
-    details += (ok ? 'O' : 'X') + ' Q' + (i+1) + ' ' + Q[i].s + ' → ' + (ok ? '正解' : '不正解（正解：' + LABELS[Q[i].a] + '. ' + Q[i].o[Q[i].a] + '）') + '\n';
+    var userAns = ans[i] === undefined ? '未回答' : LABELS[ans[i]];
+    var correctAns = LABELS[Q[i].a];
+    details += (ok ? 'O' : 'X') + ' / Q' + (i+1) + ' / 回答：' + userAns + ' / 正解：' + correctAns + '\n';
   }
   var text = '━━━━━━━━━━━━━━━━\n'
     + '*たむ小カードゲーム ゲームマスター認定試験*\n'
@@ -425,8 +427,8 @@ function showResult() {
       + '<div class="review-header"><span class="review-badge ' + (ok?'ok':'ng') + '">' + (ok?'正解':'不正解') + '</span>'
       + '<span style="font-size:11px;color:var(--text-muted)">Q' + (i+1) + ' · ' + q.s + ' · <span class="difficulty-tag ' + diffClass[q.d] + '" style="font-size:9px;">' + diffLabel[q.d] + '</span></span></div>'
       + '<div class="review-qtext">' + q.q + '</div>'
-      + ((!ok) ? '<div class="review-ans">あなたの回答: ' + (ans[i]===undefined?'未回答':LABELS[ans[i]]+'. '+q.o[ans[i]]) + '</div>' : '')
-      + '<div class="review-ans">正解: ' + LABELS[q.a] + '. ' + q.o[q.a] + '</div>'
+      + '<div class="review-ans">あなたの回答: ' + (ans[i]===undefined?'未回答':LABELS[ans[i]]+'. '+q.o[ans[i]]) + '</div>'
+      + ((!ok) ? '<div class="review-ans" style="color:#E09090;">正解: ' + LABELS[q.a] + '. ' + q.o[q.a] + '</div>' : '<div class="review-ans" style="color:#7EC898;">正解: ' + LABELS[q.a] + '. ' + q.o[q.a] + '</div>')
       + '<div class="review-exp">' + q.e + '</div></div>';
   }
   document.getElementById('q-counter').textContent = '試験完了';
