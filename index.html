@@ -141,6 +141,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <script>
+var SLACK_WEBHOOK = 'https://script.google.com/macros/s/AKfycbz1TtG5sD0kgJv_-PrBFnoUFSRdF4YGXQu3xagH8Z592bfGYVETN5X6F2PKf4_XRr-z/exec';
 var CHARA_URL = 'https://moriyama-spec.github.io/tamusho-images/%E6%A0%A1%E9%95%B7%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88.png';
 var LABELS = ['A','B','C','D'];
 var TOTAL = 30;
@@ -246,7 +247,7 @@ function render() {
   var backBtn = cur > 0 ? '<div style="margin-top:1.25rem;"><button onclick="goBack()" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 18px;color:var(--text-muted);font-size:13px;cursor:pointer;">← 前の問題に戻る</button></div>' : '';
   document.getElementById('main-area').innerHTML =
     '<div class="question-card">'
-    + '<div class="chara-wrap"><span style="font-size:52px;animation:sway 2s ease-in-out infinite;display:inline-block;transform-origin:bottom center;">✊️</span></div>'
+    + '<div class="chara-wrap"><img src="' + CHARA_URL + '" alt="" style="width:90px;height:110px;object-fit:contain;transform-origin:bottom center;animation:sway 2s ease-in-out infinite;"/></div>'
     + '<div style="margin-bottom:1rem;"><span class="section-tag">' + q.s + '</span><span class="difficulty-tag ' + diffClass[q.d] + '">' + diffLabel[q.d] + '</span></div>'
     + '<div class="q-num">Q' + (cur+1) + '</div>'
     + '<div class="q-text">' + q.q + '</div>'
