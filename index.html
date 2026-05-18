@@ -151,7 +151,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 
 <script>
 // 設定
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbw8gKoxVQRecMDG7qOZAMKJmeP4T-PCv4CZT89FG5DTJgK1Cgt_2a8vUD3GtT2J9Xez/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbz2YW2Y0Wx1C18TMwtTql78j_yyIzXnQQ4W82_YtPOmWn67chySlbH7Lh2yhnMBp_b7/exec';
 var CHARA_URL = 'https://moriyama-spec.github.io/tamusho-images/%E6%A0%A1%E9%95%B7%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88.png';
 
 var LABELS = ['A','B','C','D'];
@@ -414,9 +414,9 @@ function showResult() {
   var need = PASS - score;
   var bannerHTML = '';
   if (isPerfect) {
-    bannerHTML = '<div class="banner-perfect"><div class="b-icon">🏅</div><div class="b-title">おめでとう！満点達成！<br>あなたをたむ小カードゲーム<br>満点マイスターに認定します！</div><div class="b-sub">— PERFECT SCORE MEISTER —</div><div style="margin-top:0.75rem;font-size:14px;color:var(--gold-light);font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
+    bannerHTML = '<div class="banner-perfect"><div class="b-icon"><img src="' + BADGE_URL + '" style="width:80px;height:80px;object-fit:contain;" onerror="this.outerHTML=\'🏅\'"/></div><div class="b-title">おめでとう！満点達成！<br>あなたをたむ小カードゲーム<br>満点マイスターに認定します！</div><div class="b-sub">— PERFECT SCORE MEISTER —</div><div style="margin-top:0.75rem;font-size:14px;color:var(--gold-light);font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
   } else if (isPass) {
-    bannerHTML = '<div class="banner-pass"><div class="b-icon">🏅</div><div class="b-title">合格おめでとう！<br>あなたをたむ小カードゲーム<br>マイスターに認定します！</div><div class="b-sub">— CARD GAME MEISTER 認定 —</div><div style="margin-top:0.75rem;font-size:14px;color:#7EC898;font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
+    bannerHTML = '<div class="banner-pass"><div class="b-icon"><img src="' + BADGE_URL + '" style="width:80px;height:80px;object-fit:contain;" onerror="this.outerHTML=\'🏅\'"/></div><div class="b-title">合格おめでとう！<br>あなたをたむ小カードゲーム<br>マイスターに認定します！</div><div class="b-sub">— CARD GAME MEISTER 認定 —</div><div style="margin-top:0.75rem;font-size:14px;color:#7EC898;font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
   } else {
     bannerHTML = '<div class="banner-fail"><div class="b-icon">😔</div><div class="b-title">不合格</div><div class="b-sub">合格ライン：' + PASS + '問正解 / あなたの結果：' + score + '問正解</div><div class="b-remain">あと ' + need + ' 問正解で合格！</div></div>';
   }
