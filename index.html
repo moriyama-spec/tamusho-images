@@ -144,7 +144,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 <script>
 var GAS_URL = 'https://script.google.com/macros/s/AKfycbw8gKoxVQRecMDG7qOZAMKJmeP4T-PCv4CZT89FG5DTJgK1Cgt_2a8vUD3GtT2J9Xez/exec';
 var CHARA_URL = 'https://moriyama-spec.github.io/tamusho-images/%E6%A0%A1%E9%95%B7%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88.png';
-var BADGE_URL = 'https://raw.githubusercontent.com/moriyama-spec/tamusho-images/main/badge.png';
+var BADGE_URL = 'https://moriyama-spec.github.io/tamusho-images/badge.png';
 
 var LABELS = ['A','B','C','D'];
 var TOTAL = 30;
@@ -422,7 +422,7 @@ function showResult() {
   var isPerfect = score === TOTAL;
   var isPass = score >= PASS;
   var need = PASS - score;
-  var badgeImg = '<img src="' + BADGE_URL + '" style="width:80px;height:80px;object-fit:contain;" onerror="this.outerHTML=\'🏅\'"/>';
+  var badgeImg = '<span id="badge-wrap"><img src="' + BADGE_URL + '" style="max-width:200px;height:auto;" onerror="document.getElementById(\'badge-wrap\').innerHTML=\'<span style=&quot;font-size:64px;&quot;>🏅</span>\'"/></span>';
   var bannerHTML = '';
   if (isPerfect) {
     bannerHTML = '<div class="banner-perfect"><div style="margin-bottom:0.75rem;">' + badgeImg + '</div><div class="b-title">おめでとう！満点達成！<br>あなたをたむ小カードゲーム<br>満点マイスターに認定します！</div><div class="b-sub">— PERFECT SCORE MEISTER —</div><div style="margin-top:0.75rem;font-size:14px;color:var(--gold-light);">校長からマイスターバッチを受け取ってください</div></div>';
