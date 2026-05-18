@@ -48,7 +48,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .option-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;text-align:left;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:flex;align-items:flex-start;gap:12px;line-height:1.6;transition:border-color 0.15s,background 0.15s;}
 .option-btn:hover{border-color:var(--gold-dark);background:rgba(201,168,76,0.06);}
 .option-label{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);margin-top:1px;}
-.chara-wrap{display:flex;justify-content:center;margin-bottom:1rem;height:70px;}
+.chara-wrap{display:flex;justify-content:center;margin-bottom:1rem;height:110px;}
+.chara-img{width:90px;height:110px;object-fit:contain;transform-origin:bottom center;animation:sway 2s ease-in-out infinite;}
+@keyframes sway{0%{transform:rotate(-3deg);}50%{transform:rotate(3deg);}100%{transform:rotate(-3deg);}}
 .result-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2rem;text-align:center;animation:fadeUp 0.4s ease;}
 .result-eyebrow{font-size:11px;letter-spacing:0.2em;color:var(--text-muted);margin-bottom:1.5rem;}
 .result-score{font-family:'Noto Serif JP',serif;font-size:64px;font-weight:900;color:var(--gold-light);line-height:1;}
@@ -141,8 +143,10 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <script>
-var SLACK_WEBHOOK = 'https://script.google.com/macros/s/AKfycbz1TtG5sD0kgJv_-PrBFnoUFSRdF4YGXQu3xagH8Z592bfGYVETN5X6F2PKf4_XRr-z/exec';
+// 設定
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbz1TtG5sD0kgJv_-PrBFnoUFSRdF4YGXQu3xagH8Z592bfGYVETN5X6F2PKf4_XRr-z/exec';
 var CHARA_URL = 'https://moriyama-spec.github.io/tamusho-images/%E6%A0%A1%E9%95%B7%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88.png';
+
 var LABELS = ['A','B','C','D'];
 var TOTAL = 30;
 var PASS = 23;
@@ -247,7 +251,7 @@ function render() {
   var backBtn = cur > 0 ? '<div style="margin-top:1.25rem;"><button onclick="goBack()" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 18px;color:var(--text-muted);font-size:13px;cursor:pointer;">← 前の問題に戻る</button></div>' : '';
   document.getElementById('main-area').innerHTML =
     '<div class="question-card">'
-    + '<div class="chara-wrap"><img src="' + CHARA_URL + '" alt="" style="width:90px;height:110px;object-fit:contain;transform-origin:bottom center;animation:sway 2s ease-in-out infinite;"/></div>'
+    + '<div class="chara-wrap"><img class="chara-img" src="' + CHARA_URL + '" alt="" onerror="this.style.display=\'none\'"/></div>'
     + '<div style="margin-bottom:1rem;"><span class="section-tag">' + q.s + '</span><span class="difficulty-tag ' + diffClass[q.d] + '">' + diffLabel[q.d] + '</span></div>'
     + '<div class="q-num">Q' + (cur+1) + '</div>'
     + '<div class="q-text">' + q.q + '</div>'
@@ -382,11 +386,11 @@ function sendToSlack(name, period, score, total, isPass, isPerfect) {
     + '*全問結果*\n'
     + details
     + '━━━━━━━━━━━━━━━━';
-  fetch(SLACK_WEBHOOK, {
+  fetch(GAS_URL, {
     method: 'POST',
     headers: {'Content-Type': 'application/json'},
     body: JSON.stringify({text: text})
-  }).catch(function(){});
+  }).catch(function(err){ console.log('Slack通知エラー:', err); });
 }
 
 function showResult() {
