@@ -51,13 +51,7 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .option-label{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);margin-top:1px;}
 .chara-wrap{display:flex;justify-content:center;margin-bottom:1rem;height:110px;}
 .chara-img{width:90px;height:110px;object-fit:contain;transform-origin:bottom center;animation:sway 2s ease-in-out infinite;}
-@keyframes sway{
-  0%{transform:rotate(-4deg) translateY(0px);}
-  25%{transform:rotate(0deg) translateY(-4px);}
-  50%{transform:rotate(4deg) translateY(0px);}
-  75%{transform:rotate(0deg) translateY(-4px);}
-  100%{transform:rotate(-4deg) translateY(0px);}
-}
+@keyframes sway{0%{transform:rotate(-4deg) translateY(0px);}25%{transform:rotate(0deg) translateY(-4px);}50%{transform:rotate(4deg) translateY(0px);}75%{transform:rotate(0deg) translateY(-4px);}100%{transform:rotate(-4deg) translateY(0px);}}
 .result-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2rem;text-align:center;animation:fadeUp 0.4s ease;}
 .result-eyebrow{font-size:11px;letter-spacing:0.2em;color:var(--text-muted);margin-bottom:1.5rem;}
 .result-score{font-family:'Noto Serif JP',serif;font-size:64px;font-weight:900;color:var(--gold-light);line-height:1;}
@@ -67,11 +61,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 .retry-btn:hover{background:rgba(201,168,76,0.1);}
 .banner-perfect{background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(232,201,122,0.08));border:2px solid var(--gold);border-radius:14px;padding:2rem 1.5rem;margin-bottom:1.75rem;animation:perfectPulse 2s ease-in-out infinite;}
 @keyframes perfectPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0);}50%{box-shadow:0 0 32px 8px rgba(201,168,76,0.22);}}
-.banner-perfect .b-icon{font-size:48px;margin-bottom:0.5rem;}
 .banner-perfect .b-title{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:900;color:var(--gold-light);line-height:1.6;margin-bottom:0.4rem;}
 .banner-perfect .b-sub{font-size:12px;color:var(--gold);letter-spacing:0.15em;}
 .banner-pass{background:linear-gradient(135deg,rgba(74,140,92,0.15),rgba(74,140,92,0.06));border:1.5px solid #4A8C5C;border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.75rem;}
-.banner-pass .b-icon{font-size:44px;margin-bottom:0.5rem;}
 .banner-pass .b-title{font-family:'Noto Serif JP',serif;font-size:19px;font-weight:900;color:#7EC898;line-height:1.6;margin-bottom:0.4rem;}
 .banner-pass .b-sub{font-size:12px;color:#5aab72;letter-spacing:0.12em;}
 .banner-fail{background:linear-gradient(135deg,rgba(140,74,74,0.2),rgba(140,74,74,0.08));border:1.5px solid #8C4A4A;border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.75rem;}
@@ -150,9 +142,9 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellips
 </div>
 
 <script>
-// 設定
-var GAS_URL = 'https://script.google.com/macros/s/AKfycbz2YW2Y0Wx1C18TMwtTql78j_yyIzXnQQ4W82_YtPOmWn67chySlbH7Lh2yhnMBp_b7/exec';
+var GAS_URL = 'https://script.google.com/macros/s/AKfycbw8gKoxVQRecMDG7qOZAMKJmeP4T-PCv4CZT89FG5DTJgK1Cgt_2a8vUD3GtT2J9Xez/exec';
 var CHARA_URL = 'https://moriyama-spec.github.io/tamusho-images/%E6%A0%A1%E9%95%B7%E3%82%A4%E3%83%A9%E3%82%B9%E3%83%88.png';
+var BADGE_URL = 'https://raw.githubusercontent.com/moriyama-spec/tamusho-images/main/badge.png';
 
 var LABELS = ['A','B','C','D'];
 var TOTAL = 30;
@@ -224,6 +216,7 @@ function playFanfare() {
 function startExam() {
   userName = document.getElementById('name-input').value.trim();
   userPeriod = document.getElementById('period-input').value.trim();
+  cur = 0; score = 0; ans = [];
   playFanfare();
   var fl = document.createElement('div');
   fl.style.cssText = 'position:fixed;inset:0;background:#C9A84C;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.08s';
@@ -237,12 +230,13 @@ function startExam() {
     setTimeout(function(){
       document.getElementById('opening').style.display = 'none';
       document.getElementById('main-container').style.display = 'block';
+      render(); // ← startExam()の中でのみ呼ぶ
     }, 800);
   }, 2000);
 }
 
 function render() {
-  if (cur >= TOTAL) { showResult(); return; }
+  if (cur >= TOTAL) { showConfirm(); return; }
   var q = Q[cur];
   document.getElementById('q-counter').textContent = '問題 ' + (cur+1) + ' / ' + TOTAL;
   document.getElementById('score-counter').textContent = cur + ' / ' + TOTAL + ' 回答済';
@@ -268,31 +262,14 @@ function render() {
 }
 
 function choose(i) {
-  var isNew = ans[cur] === undefined;
   if (ans[cur] === Q[cur].a && i !== Q[cur].a) score--;
   if (ans[cur] !== Q[cur].a && i === Q[cur].a) score++;
   ans[cur] = i;
   var prevCur = cur;
   cur++;
-  if (prevCur === HALFWAY - 1 && isNew) { showHalfway(); return; }
-  if (cur === TOTAL) { showConfirm(); return; }
+  if (prevCur === HALFWAY - 1) { showHalfway(); return; }
+  if (cur >= TOTAL) { showConfirm(); return; }
   render();
-}
-
-function showConfirm() {
-  document.getElementById('q-counter').textContent = '試験完了';
-  document.getElementById('score-counter').textContent = TOTAL + ' / ' + TOTAL + ' 回答済';
-  document.getElementById('progress').style.width = '100%';
-  document.getElementById('main-area').innerHTML =
-    '<div class="question-card" style="text-align:center;padding:2.5rem 1.75rem;">'
-    + '<div style="font-size:52px;margin-bottom:1rem;">📝</div>'
-    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:20px;font-weight:700;color:var(--gold-light);margin-bottom:0.75rem;">全30問の回答が完了しました</div>'
-    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:2rem;">提出すると結果が表示されます</div>'
-    + '<div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto;">'
-    + '<button onclick="showResult()" style="padding:14px 32px;background:var(--gold);border:none;border-radius:6px;color:#000;font-size:15px;font-family:\'Noto Serif JP\',serif;font-weight:700;cursor:pointer;letter-spacing:0.1em;">試験を提出する</button>'
-    + '<button onclick="goBack()" style="padding:12px 32px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:14px;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">← 前の問題に戻る</button>'
-    + '</div>'
-    + '</div>';
 }
 
 function goBack() {
@@ -309,6 +286,22 @@ function showHalfway() {
     + '<div style="font-family:\'Noto Serif JP\',serif;font-size:20px;font-weight:700;color:var(--gold-light);margin-bottom:0.75rem;">あと残り15問です。</div>'
     + '<div style="font-size:15px;color:var(--text-muted);margin-bottom:2rem;">頑張って！</div>'
     + '<button class="retry-btn" onclick="render()" style="padding:12px 40px;font-size:15px;">▶ 続ける</button>'
+    + '</div>';
+}
+
+function showConfirm() {
+  document.getElementById('q-counter').textContent = '試験完了';
+  document.getElementById('score-counter').textContent = TOTAL + ' / ' + TOTAL + ' 回答済';
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('main-area').innerHTML =
+    '<div class="question-card" style="text-align:center;padding:2.5rem 1.75rem;">'
+    + '<div style="font-size:52px;margin-bottom:1rem;">📝</div>'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:20px;font-weight:700;color:var(--gold-light);margin-bottom:0.75rem;">全30問の回答が完了しました</div>'
+    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:2rem;">提出すると結果が表示されます</div>'
+    + '<div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto;">'
+    + '<button onclick="showResult()" style="padding:14px 32px;background:var(--gold);border:none;border-radius:6px;color:#000;font-size:15px;font-family:\'Noto Serif JP\',serif;font-weight:700;cursor:pointer;letter-spacing:0.1em;">回答を提出する</button>'
+    + '<button onclick="goBack()" style="padding:12px 32px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:14px;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">← 前の問題に戻る</button>'
+    + '</div>'
     + '</div>';
 }
 
@@ -413,7 +406,6 @@ function sendToSlack(name, period, score, total, isPass, isPerfect) {
     + '*全問結果*\n'
     + details
     + '━━━━━━━━━━━━━━━━';
-
   fetch(GAS_URL, {
     method: 'POST',
     headers: {'Content-Type': 'text/plain'},
@@ -430,11 +422,12 @@ function showResult() {
   var isPerfect = score === TOTAL;
   var isPass = score >= PASS;
   var need = PASS - score;
+  var badgeImg = '<img src="' + BADGE_URL + '" style="width:80px;height:80px;object-fit:contain;" onerror="this.outerHTML=\'🏅\'"/>';
   var bannerHTML = '';
   if (isPerfect) {
-    bannerHTML = '<div class="banner-perfect"><div class="b-icon"><img src="' + BADGE_URL + '" style="width:80px;height:80px;object-fit:contain;" onerror="this.outerHTML=\'🏅\'"/></div><div class="b-title">おめでとう！満点達成！<br>あなたをたむ小カードゲーム<br>満点マイスターに認定します！</div><div class="b-sub">— PERFECT SCORE MEISTER —</div><div style="margin-top:0.75rem;font-size:14px;color:var(--gold-light);font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
+    bannerHTML = '<div class="banner-perfect"><div style="margin-bottom:0.75rem;">' + badgeImg + '</div><div class="b-title">おめでとう！満点達成！<br>あなたをたむ小カードゲーム<br>満点マイスターに認定します！</div><div class="b-sub">— PERFECT SCORE MEISTER —</div><div style="margin-top:0.75rem;font-size:14px;color:var(--gold-light);">校長からマイスターバッチを受け取ってください</div></div>';
   } else if (isPass) {
-    bannerHTML = '<div class="banner-pass"><div class="b-icon"><img src="' + BADGE_URL + '" style="width:80px;height:80px;object-fit:contain;" onerror="this.outerHTML=\'🏅\'"/></div><div class="b-title">合格おめでとう！<br>あなたをたむ小カードゲーム<br>マイスターに認定します！</div><div class="b-sub">— CARD GAME MEISTER 認定 —</div><div style="margin-top:0.75rem;font-size:14px;color:#7EC898;font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
+    bannerHTML = '<div class="banner-pass"><div style="margin-bottom:0.75rem;">' + badgeImg + '</div><div class="b-title">合格おめでとう！<br>あなたをたむ小カードゲーム<br>マイスターに認定します！</div><div class="b-sub">— CARD GAME MEISTER 認定 —</div><div style="margin-top:0.75rem;font-size:14px;color:#7EC898;">校長からマイスターバッチを受け取ってください</div></div>';
   } else {
     bannerHTML = '<div class="banner-fail"><div class="b-icon">😔</div><div class="b-title">不合格</div><div class="b-sub">合格ライン：' + PASS + '問正解 / あなたの結果：' + score + '問正解</div><div class="b-remain">あと ' + need + ' 問正解で合格！</div></div>';
   }
@@ -477,7 +470,7 @@ function restart() {
   document.getElementById('start-btn').disabled = true;
 }
 
-render();
+// render()はstartExam()の中でのみ呼ぶ。ここでは呼ばない。
 </script>
 </body>
 </html>
