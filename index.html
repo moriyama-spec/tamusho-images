@@ -274,7 +274,24 @@ function choose(i) {
   ans[cur] = i;
   cur++;
   if (cur === HALFWAY && isNew) { showHalfway(); return; }
+  if (cur === TOTAL) { showConfirm(); return; }
   render();
+}
+
+function showConfirm() {
+  document.getElementById('q-counter').textContent = '試験完了';
+  document.getElementById('score-counter').textContent = TOTAL + ' / ' + TOTAL + ' 回答済';
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('main-area').innerHTML =
+    '<div class="question-card" style="text-align:center;padding:2.5rem 1.75rem;">'
+    + '<div style="font-size:52px;margin-bottom:1rem;">📝</div>'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:20px;font-weight:700;color:var(--gold-light);margin-bottom:0.75rem;">全30問の回答が完了しました</div>'
+    + '<div style="font-size:14px;color:var(--text-muted);margin-bottom:2rem;">提出すると結果が表示されます</div>'
+    + '<div style="display:flex;flex-direction:column;gap:12px;max-width:300px;margin:0 auto;">'
+    + '<button onclick="showResult()" style="padding:14px 32px;background:var(--gold);border:none;border-radius:6px;color:#000;font-size:15px;font-family:\'Noto Serif JP\',serif;font-weight:700;cursor:pointer;letter-spacing:0.1em;">試験を提出する</button>'
+    + '<button onclick="goBack()" style="padding:12px 32px;background:transparent;border:1px solid var(--border);border-radius:6px;color:var(--text-muted);font-size:14px;font-family:\'Noto Sans JP\',sans-serif;cursor:pointer;">← 前の問題に戻る</button>'
+    + '</div>'
+    + '</div>';
 }
 
 function goBack() {
