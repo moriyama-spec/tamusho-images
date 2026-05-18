@@ -272,8 +272,9 @@ function choose(i) {
   if (ans[cur] === Q[cur].a && i !== Q[cur].a) score--;
   if (ans[cur] !== Q[cur].a && i === Q[cur].a) score++;
   ans[cur] = i;
+  var prevCur = cur;
   cur++;
-  if (cur === HALFWAY && isNew) { showHalfway(); return; }
+  if (prevCur === HALFWAY - 1 && isNew) { showHalfway(); return; }
   if (cur === TOTAL) { showConfirm(); return; }
   render();
 }
