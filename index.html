@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TAMUSHO CARD PROJECT</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700;900&family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E8C97A;--gold-dark:#8B6914;--bg:#0A0705;--bg2:#130E08;--bg3:#1C1510;--border:rgba(201,168,76,0.25);--border-strong:rgba(201,168,76,0.6);--text:#F0E6CC;--text-muted:#9A8060;--correct:#4A8C5C;--correct-bg:rgba(74,140,92,0.15);--wrong:#8C4A4A;--wrong-bg:rgba(140,74,74,0.15);}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:'Noto Sans JP',sans-serif;min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(201,168,76,0.08) 0%,transparent 70%);pointer-events:none;z-index:0;}
+#opening{position:fixed;inset:0;background:#0A0705;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;overflow:hidden;}
+#opening.hide{animation:openingOut 0.8s ease forwards;pointer-events:none;}
+@keyframes openingOut{to{opacity:0;transform:scale(1.04);}}
+.op-bg-rays{position:absolute;inset:0;background:repeating-conic-gradient(rgba(201,168,76,0.04) 0deg 10deg,transparent 10deg 20deg);animation:raysSpin 30s linear infinite;transform-origin:center;}
+@keyframes raysSpin{to{transform:rotate(360deg);}}
+.op-glow{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.12) 0%,transparent 70%);animation:glowPulse 2.5s ease-in-out infinite;}
+@keyframes glowPulse{0%,100%{transform:scale(1);opacity:0.7;}50%{transform:scale(1.2);opacity:1;}}
+.op-content{position:relative;z-index:2;text-align:center;display:flex;flex-direction:column;align-items:center;}
+.op-presents{font-size:11px;letter-spacing:0.3em;color:var(--gold);opacity:0;animation:fadeInUp 0.6s ease 0.3s forwards;margin-bottom:1rem;}
+.op-divider{display:flex;align-items:center;gap:12px;margin:1.25rem 0 1rem;opacity:0;animation:fadeInUp 0.5s ease 1.4s forwards;width:min(360px,80vw);}
+.op-divider-line{flex:1;height:1px;background:linear-gradient(to right,transparent,var(--gold-dark));}
+.op-divider-line.rev{background:linear-gradient(to left,transparent,var(--gold-dark));}
+.op-divider-diamond{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);flex-shrink:0;}
+.op-subtitle{font-family:'Noto Serif JP',serif;font-size:clamp(16px,4vw,22px);font-weight:700;color:var(--text);letter-spacing:0.15em;opacity:0;animation:fadeInUp 0.6s ease 1.6s forwards;}
+.op-chara-emoji{font-size:64px;margin-top:0.5rem;opacity:0;animation:charaEntry 0.8s cubic-bezier(.2,1.3,.4,1) 2s forwards;}
+@keyframes charaEntry{from{opacity:0;transform:translateY(40px) scale(0.8);}to{opacity:1;transform:translateY(0) scale(1);}}
+.op-start-btn{padding:14px 48px;background:transparent;border:1px solid var(--gold);border-radius:4px;color:var(--gold-light);font-family:'Noto Serif JP',serif;font-size:15px;letter-spacing:0.15em;cursor:pointer;transition:background 0.2s;margin-top:1rem;}
+.op-start-btn:hover:not(:disabled){background:rgba(201,168,76,0.12);}
+.op-start-btn:disabled{opacity:0.35;cursor:not-allowed;}
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+.container{position:relative;z-index:1;max-width:680px;margin:0 auto;padding:2rem 1.25rem 4rem;}
+.header{text-align:center;padding:2.5rem 0 2rem;border-bottom:1px solid var(--border);margin-bottom:2rem;}
+.ornament{display:flex;align-items:center;gap:12px;justify-content:center;margin:1rem 0 0;}
+.ornament-line{flex:1;max-width:80px;height:1px;background:linear-gradient(to right,transparent,var(--gold-dark));}
+.ornament-line.rev{background:linear-gradient(to left,transparent,var(--gold-dark));}
+.ornament-diamond{width:6px;height:6px;background:var(--gold);transform:rotate(45deg);}
+.progress-wrap{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;font-size:12px;color:var(--text-muted);}
+.progress-track{height:3px;background:var(--bg3);border-radius:99px;margin-bottom:1.75rem;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(to right,var(--gold-dark),var(--gold));border-radius:99px;transition:width 0.4s cubic-bezier(.4,0,.2,1);}
+.question-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:1.75rem;animation:fadeUp 0.3s ease;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px);}to{opacity:1;transform:translateY(0);}}
+.section-tag{display:inline-block;font-size:10px;letter-spacing:0.12em;padding:3px 10px;border:1px solid var(--border);border-radius:99px;color:var(--gold);margin-bottom:1rem;}
+.q-num{font-size:11px;color:var(--text-muted);margin-bottom:6px;}
+.q-text{font-family:'Noto Serif JP',serif;font-size:17px;font-weight:700;line-height:1.7;margin-bottom:1.5rem;color:var(--text);}
+.options{display:flex;flex-direction:column;gap:10px;}
+.option-btn{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 16px;text-align:left;color:var(--text);font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;display:flex;align-items:flex-start;gap:12px;line-height:1.6;transition:border-color 0.15s,background 0.15s;}
+.option-btn:hover{border-color:var(--gold-dark);background:rgba(201,168,76,0.06);}
+.option-label{flex-shrink:0;width:22px;height:22px;border-radius:50%;border:1px solid var(--border-strong);display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--gold);margin-top:1px;}
+.chara-wrap{display:flex;justify-content:center;margin-bottom:1rem;height:70px;}
+.result-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:2.5rem 2rem;text-align:center;animation:fadeUp 0.4s ease;}
+.result-eyebrow{font-size:11px;letter-spacing:0.2em;color:var(--text-muted);margin-bottom:1.5rem;}
+.result-score{font-family:'Noto Serif JP',serif;font-size:64px;font-weight:900;color:var(--gold-light);line-height:1;}
+.result-total{font-size:20px;color:var(--text-muted);}
+.result-pct{font-size:14px;color:var(--text-muted);margin-top:4px;margin-bottom:1.75rem;}
+.retry-btn{padding:12px 32px;background:transparent;border:1px solid var(--border-strong);border-radius:6px;color:var(--gold-light);font-size:14px;font-family:'Noto Sans JP',sans-serif;cursor:pointer;transition:background 0.15s;}
+.retry-btn:hover{background:rgba(201,168,76,0.1);}
+.banner-perfect{background:linear-gradient(135deg,rgba(201,168,76,0.18),rgba(232,201,122,0.08));border:2px solid var(--gold);border-radius:14px;padding:2rem 1.5rem;margin-bottom:1.75rem;animation:perfectPulse 2s ease-in-out infinite;}
+@keyframes perfectPulse{0%,100%{box-shadow:0 0 0 0 rgba(201,168,76,0);}50%{box-shadow:0 0 32px 8px rgba(201,168,76,0.22);}}
+.banner-perfect .b-icon{font-size:48px;margin-bottom:0.5rem;}
+.banner-perfect .b-title{font-family:'Noto Serif JP',serif;font-size:20px;font-weight:900;color:var(--gold-light);line-height:1.6;margin-bottom:0.4rem;}
+.banner-perfect .b-sub{font-size:12px;color:var(--gold);letter-spacing:0.15em;}
+.banner-pass{background:linear-gradient(135deg,rgba(74,140,92,0.15),rgba(74,140,92,0.06));border:1.5px solid #4A8C5C;border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.75rem;}
+.banner-pass .b-icon{font-size:44px;margin-bottom:0.5rem;}
+.banner-pass .b-title{font-family:'Noto Serif JP',serif;font-size:19px;font-weight:900;color:#7EC898;line-height:1.6;margin-bottom:0.4rem;}
+.banner-pass .b-sub{font-size:12px;color:#5aab72;letter-spacing:0.12em;}
+.banner-fail{background:linear-gradient(135deg,rgba(140,74,74,0.2),rgba(140,74,74,0.08));border:1.5px solid #8C4A4A;border-radius:14px;padding:1.75rem 1.5rem;margin-bottom:1.75rem;}
+.banner-fail .b-icon{font-size:44px;margin-bottom:0.5rem;}
+.banner-fail .b-title{font-family:'Noto Serif JP',serif;font-size:19px;font-weight:900;color:#E09090;line-height:1.6;margin-bottom:0.4rem;}
+.banner-fail .b-sub{font-size:13px;color:#c07070;margin-top:0.5rem;}
+.banner-fail .b-remain{display:inline-block;margin-top:0.75rem;padding:6px 20px;background:rgba(140,74,74,0.25);border:1px solid #8C4A4A;border-radius:99px;font-size:13px;font-weight:700;color:#E09090;}
+.review-list{margin-top:2rem;text-align:left;display:flex;flex-direction:column;gap:12px;}
+.review-item{background:var(--bg3);border-radius:8px;padding:14px 16px;border-left:3px solid var(--border);}
+.review-item.ok{border-left-color:var(--correct);}
+.review-item.ng{border-left-color:var(--wrong);}
+.review-header{display:flex;align-items:center;gap:8px;margin-bottom:6px;}
+.review-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;}
+.review-badge.ok{background:var(--correct-bg);color:#7EC898;}
+.review-badge.ng{background:var(--wrong-bg);color:#E09090;}
+.review-qtext{font-size:13px;font-weight:500;color:var(--text);margin-bottom:4px;}
+.review-ans{font-size:12px;color:var(--text-muted);margin-bottom:4px;}
+.review-exp{font-size:12px;color:var(--text-muted);line-height:1.6;}
+.text-logo{text-align:center;margin:0 auto 0.5rem;}
+.logo-main{display:block;font-family:'Noto Serif JP',serif;font-size:clamp(28px,8vw,52px);font-weight:900;color:var(--gold-light);letter-spacing:0.08em;filter:drop-shadow(0 2px 8px rgba(201,168,76,0.4));}
+.logo-sub{display:block;font-size:clamp(11px,3vw,16px);letter-spacing:0.35em;color:var(--gold);margin-top:-4px;}
+.op-logo-text{opacity:0;animation:logoReveal 1s cubic-bezier(.2,1,.3,1) 0.7s forwards;}
+@keyframes logoReveal{from{opacity:0;transform:scale(0.7) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.difficulty-tag{font-size:10px;padding:2px 8px;border-radius:99px;margin-left:6px;font-weight:700;}
+.tag-easy{background:rgba(74,140,92,0.2);color:#7EC898;}
+.tag-normal{background:rgba(201,168,76,0.2);color:var(--gold);}
+.tag-hard{background:rgba(140,74,74,0.2);color:#E09090;}
+</style>
+</head>
+<body>
+<div id="opening">
+  <div class="op-bg-rays"></div>
+  <div class="op-glow"></div>
+  <div class="op-content">
+    <div class="op-presents">田村淳の大人の小学校 PRESENTS</div>
+    <div class="text-logo op-logo-text"><span class="logo-main">TAMUSHO</span><span class="logo-sub">CARD PROJECT</span></div>
+    <div class="op-divider">
+      <div class="op-divider-line"></div>
+      <div class="op-divider-diamond"></div>
+      <div class="op-divider-diamond" style="opacity:.4"></div>
+      <div class="op-divider-diamond"></div>
+      <div class="op-divider-line rev"></div>
+    </div>
+    <div class="op-subtitle">ゲームマスター認定試験 — 全30問</div>
+    <div class="op-chara-emoji">✊️✌️✋️</div>
+    <div style="margin-top:1.5rem;opacity:0;animation:fadeInUp 0.6s ease 2.2s forwards;width:min(320px,80vw);display:flex;flex-direction:column;gap:10px;">
+      <input id="name-input" type="text" placeholder="お名前を入力してください" maxlength="30"
+        style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid var(--border-strong);border-radius:6px;color:var(--text);font-size:15px;font-family:'Noto Sans JP',sans-serif;outline:none;text-align:center;"
+        oninput="checkReady()"/>
+      <input id="period-input" type="text" placeholder="期を入力してください（例：1）" maxlength="10"
+        style="width:100%;padding:12px 16px;background:rgba(255,255,255,0.05);border:1px solid var(--border-strong);border-radius:6px;color:var(--text);font-size:15px;font-family:'Noto Sans JP',sans-serif;outline:none;text-align:center;"
+        oninput="checkReady()"/>
+    </div>
+    <button id="start-btn" class="op-start-btn" onclick="startExam()" disabled style="opacity:0;animation:fadeInUp 0.6s ease 2.6s forwards;">▶ 試験を開始する</button>
+  </div>
+</div>
+
+<div class="container" id="main-container" style="display:none">
+  <div class="header">
+    <div class="text-logo"><span class="logo-main">TAMUSHO</span><span class="logo-sub">CARD PROJECT</span></div>
+    <div style="font-size:13px;color:var(--text-muted);margin-top:0.25rem;">ゲームマスター認定試験 — 全30問</div>
+    <div class="ornament">
+      <div class="ornament-line"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-diamond" style="opacity:.4"></div>
+      <div class="ornament-diamond"></div>
+      <div class="ornament-line rev"></div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span id="q-counter">問題 1 / 30</span>
+    <span id="score-counter">0 / 30 回答済</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progress" style="width:0%"></div></div>
+  <div id="main-area"></div>
+</div>
+
+<script>
+var SLACK_WEBHOOK = 'https://script.google.com/macros/s/AKfycbwRqu_O2bb86ByISwT_6Cngq5YSg7mX_aUgC-l5BdsuZ8Ez3I5YwoBwYJUsJSIZG0cO/exec';
+var LABELS = ['A','B','C','D'];
+var TOTAL = 30;
+var PASS = 23;
+var HALFWAY = 15;
+var cur = 0, score = 0, userName = '', userPeriod = '';
+var ans = [];
+var diffLabel = {easy:'やさしい', normal:'ふつう', hard:'むずかしい'};
+var diffClass = {easy:'tag-easy', normal:'tag-normal', hard:'tag-hard'};
+
+var Q = [
+  {s:"カードの種類",d:"easy",q:"たむ小カードのキャラカードの色は全何色でしょうか？",o:["2色","3色","4色","5色"],a:2,e:"たむ小カードのキャラカードは全4色あります。"},
+  {s:"カードの種類",d:"easy",q:"たむ小カードの初回生産シリーズの名前は？",o:["Origin","Start","First","Birth"],a:3,e:"初回生産シリーズの名前はBirthです。"},
+  {s:"カードの種類",d:"easy",q:"フィールドカードの役割として正しいものはどれですか？",o:["じゃんけんで勝ったときのボーナス点を付与する","相手のキャラカードをポケットに送る","手札を増やすことができる","相手の勝ち点を減らすことができる"],a:0,e:"フィールドカードはじゃんけんで勝ったときに拳力に加算されるボーナス点を付与する役割があります。"},
+  {s:"ゲームの準備",d:"easy",q:"ゲーム開始前のじゃんけんで勝った方が選べる権利はどれですか？",o:["デッキの枚数を選ぶ","最初のドロー枚数を選ぶ","フィールドカードの枚数を選ぶ","先攻か後攻を選ぶ"],a:3,e:"ゲーム開始時のじゃんけんで勝った方が先攻か後攻を選んでゲームスタートします。"},
+  {s:"勝利条件",d:"easy",q:"先に何点を獲得したプレイヤーが勝利しますか？",o:["15点","20点","25点","30点"],a:1,e:"先に勝ち点20点を獲得したプレイヤーが勝利です。"},
+  {s:"ドローフェイズ",d:"easy",q:"ドローフェイズでは手札が何枚になるまでカードを引きますか？",o:["3枚になるまで","4枚になるまで","5枚になるまで","6枚になるまで"],a:1,e:"ドローフェイズでは手札が4枚になるまでカードを引きます。"},
+  {s:"勝敗フェイズ",d:"easy",q:"バトルで勝ったキャラカードはどうなりますか？",o:["手札に戻る","盤面に残る","ポケットに送られる","デッキの下に戻る"],a:1,e:"バトルで勝ったキャラカードは盤面に残ります。"},
+  {s:"その他のルール",d:"easy",q:"ポケットに送られたカードはその後どうなりますか？ワザの効果は除く",o:["そのゲーム中は使用できない","手札に戻る","次のターン開始時に手札に戻る","デッキに戻る"],a:0,e:"ポケットに送られたカードはそのゲーム中は使用できません。"},
+  {s:"フィールドカード",d:"easy",q:"フィールドカードの使い方として正しいものはどれですか？",o:["手札から直接バトルフィールドに出す","デッキに戻していつでも引き直せる","フィールドデッキから、フィールドに出す","相手のキャラカードをポケットに送ることができる"],a:2,e:"フィールドカードはフィールドデッキから引いてフィールドに出します。"},
+  {s:"デッキ構築",d:"easy",q:"デッキは最大何枚まで入れることができますか？",o:["15枚","20枚","25枚","30枚"],a:1,e:"デッキに入れられるカードは最大20枚です。"},
+  {s:"カードの種類",d:"normal",q:"キャラカードのワザに記載されている★マークの意味として正しいものはどれですか？",o:["特別なレアカードを表す","コストをどの色でも利用可能","使用回数が1回限り","相手のカードに使用できない"],a:1,e:"★マークはコストをどの色のキャラカードでも利用可能なワザを表しています。"},
+  {s:"ゲームの準備",d:"normal",q:"ゲーム開始時、最初の手札は何枚ですか？",o:["2枚","4枚","6枚","8枚"],a:1,e:"ゲーム開始時の最初の手札は4枚です。"},
+  {s:"ターンの流れ",d:"normal",q:"ゲームは全部で何ターン行いますか？",o:["4ターン","5ターン","6ターン","8ターン"],a:2,e:"ゲームは全部で6ターン行います。"},
+  {s:"フィールドカード",d:"normal",q:"1ターンで使えるフィールドデッキの枚数は最大何枚ですか？",o:["1枚","2枚","3枚","5枚"],a:0,e:"1ターンで使えるフィールドデッキは最大1枚です。"},
+  {s:"基本ルール",d:"normal",q:"プレイヤーの持ち点が3点のとき、マイナス4点の勝ち点を得てしまいました。このときの持ち点は何点になりますか？",o:["3点のまま変わらない","相手プレイヤーに1点が入る","0点","マイナス1点"],a:2,e:"持ち点はどんな場合も0点以下にはなりません。マイナス勝ち点を得て持ち点を下回る場合は、0点で止まります。"},
+  {s:"コストフェイズ",d:"normal",q:"コストエリアに置いたカードは通常どの向きになりますか？",o:["縦向き","裏向き","いずれでもよい","横向き"],a:0,e:"コストエリアに新たに置いたカードは縦向きになります。"},
+  {s:"コストフェイズ",d:"normal",q:"コストを支払うとき、コストエリアのカードをどうしますか？",o:["縦向きにする","手札に戻す","ポケットに送る","横向きにする"],a:3,e:"コストを支払う際はコストエリアのカードを横向きにします。"},
+  {s:"その他のルール",d:"normal",q:"山札も手札も0枚になり、バトルフィールドにキャラカードが出せなくなった場合、どうなりますか？",o:["そのターンをスキップできる","ゲームは引き分けになる","山札からカードを1枚引ける","ゲームに敗北する"],a:3,e:"山札も手札も0枚になりバトルフィールドにキャラカードが出せなくなった場合はゲームに敗北します。"},
+  {s:"キャラカード",d:"normal",q:"キャラカードに書かれている拳力とは何を表していますか？",o:["じゃんけんで勝ったときに獲得できる勝ち点","バトルフィールドに出すために必要なコスト","カードをドローできる枚数","じゃんけんで勝った時に相手に与えるダメージ"],a:0,e:"拳力はじゃんけんで勝ったときに獲得できる勝ち点を表しています。"},
+  {s:"勝敗フェイズ",d:"normal",q:"バトルの勝敗が決まらずにあいこになった場合の処理として正しいものはどれですか？",o:["両プレイヤーのキャラカードをポケットへ送る","両プレイヤーのキャラカードを手札に戻す","そのバトルをキャンセルしてエンドフェイズへ進む","お互いに追加のキャラカードを1枚ずつ出す"],a:1,e:"あいこになった場合、両プレイヤーのキャラカードを手札に戻します。"},
+  {s:"キャラカード",d:"hard",q:"拳力の説明として正しくないものはどれですか？",o:["じゃんけんで勝ったときの勝ち点になる","フィールドのボーナスと合算される","拳力の数分コストがないと利用できない","数字が大きいほど多くの勝ち点を獲得できる"],a:2,e:"拳力はじゃんけんで勝ったときの勝ち点を表すものであり、コストとは別の概念です。"},
+  {s:"勝敗フェイズ",d:"hard",q:"ジャン勝ちしたキャラの獲得勝ち点の計算式として正しいものはどれですか？",o:["キャラの拳力のみ","キャラの拳力×フィールドのボーナス","キャラの拳力＋フィールドのボーナス","フィールドのボーナスのみ"],a:2,e:"ジャン勝ちしたキャラの拳力＋フィールドカードのボーナスの合計が勝ち点となります。"},
+  {s:"フィールドカード",d:"hard",q:"フィールドカードのボーナスはいつ適用されますか？",o:["バトルフィールドに出したとき","コストを払ったとき","じゃんけんで勝ったとき","エンドフェイズのとき"],a:2,e:"フィールドカードのボーナスはじゃんけんで勝ったときに拳力に加算されて適用されます。"},
+  {s:"カードの種類",d:"hard",q:"ワザを使用した後、そのキャラカードはどこへいきますか？",o:["手札に戻る","デッキの下に戻る","山札に戻る","ポケット"],a:3,e:"ワザを使用した後、そのキャラカードはポケットに送られます。"},
+  {s:"コストの置き方",d:"hard",q:"コストエリアにカードを置くとき、正しい方法はどれですか？",o:["手札から2枚選んでコストエリアに置く","手札から1枚選んでコストエリアに置く、またはデッキ上のカードをコストエリアに置く","デッキ上のカードを手札に加える","コストエリアのカードを手札に戻す"],a:1,e:"コストを置くときは手札から1枚コストエリアへか、デッキの一番上のカードをコストエリアへのどちらかを選びます。"},
+  {s:"バトルフェイズ",d:"hard",q:"バトルフェイズが終了する条件はどれですか？",o:["先攻プレイヤーがパスをしたとき","後攻プレイヤーがパスをしたとき","どちらかのプレイヤーの手札がなくなったとき","両プレイヤーが連続してパスをしたとき"],a:3,e:"両プレイヤーが連続してパスをすると、バトルフェイズは終了します。"},
+  {s:"ワザの使い方",d:"hard",q:"ワザを使用する手順として正しいものはどれですか？",o:["効果実行→コストを払いカードを公開→ポケットへ","コストを払いカードを公開→効果実行→ポケットへ","コストを払いカードを公開→ポケットへ→効果実行","効果実行→ポケットへ→コストを払いカードを公開"],a:1,e:"ワザの使用順はコストを払いカードを公開→効果実行→ポケットへです。"},
+  {s:"バトルフェイズ",d:"hard",q:"1ターンにプレイヤーが使えるワザの回数に上限はありますか？",o:["1回のみ","2回まで","上限なし、何回でも使える","コストの許す限り何回でも使える"],a:3,e:"1ターンに使えるワザの回数に制限はなく、コストが支払える限り何回でも使えます。"},
+  {s:"エンドフェイズ",d:"hard",q:"エンドフェイズで行われる処理として正しくないものはどれですか？",o:["コストエリアのカードをすべて縦向きに戻す","手札のカードをすべてデッキに戻す","フィールドカードをそれぞれのプレイヤーの空き地に置く","ターン中のワザの効果を終了させる"],a:1,e:"エンドフェイズで手札をデッキに戻すルールはありません。"},
+  {s:"デッキ構築",d:"hard",q:"デッキに入れることができる同名カードの最大枚数は何枚ですか？",o:["制限なし","2枚まで","3枚まで","1枚のみ"],a:3,e:"デッキには同名カードを1枚までしか入れることができません。"}
+];
+
+function checkReady() {
+  var name = document.getElementById('name-input').value.trim();
+  var period = document.getElementById('period-input').value.trim();
+  document.getElementById('start-btn').disabled = !(name && period);
+}
+
+function playFanfare() {
+  try {
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    var notes = [[523,0,.15,.5],[659,.15,.15,.5],[784,.3,.15,.5],[1047,.45,.4,.7],[784,.45,.4,.4],[1047,.85,.6,.8],[880,.85,.6,.4],[659,.85,.6,.3],[1319,1.45,.8,.9],[1047,1.45,.8,.5],[784,1.45,.8,.3]];
+    for (var i = 0; i < notes.length; i++) {
+      (function(n) {
+        var o = ctx.createOscillator(), e = ctx.createGain();
+        o.connect(e); e.connect(ctx.destination);
+        o.type = 'triangle'; o.frequency.value = n[0];
+        var t = ctx.currentTime + n[1];
+        e.gain.setValueAtTime(0, t);
+        e.gain.linearRampToValueAtTime(n[3]*.35, t+.02);
+        e.gain.exponentialRampToValueAtTime(.001, t+n[2]);
+        o.start(t); o.stop(t+n[2]+.05);
+      })(notes[i]);
+    }
+  } catch(e) {}
+}
+
+function startExam() {
+  userName = document.getElementById('name-input').value.trim();
+  userPeriod = document.getElementById('period-input').value.trim();
+  playFanfare();
+  var fl = document.createElement('div');
+  fl.style.cssText = 'position:fixed;inset:0;background:#C9A84C;z-index:200;opacity:0;pointer-events:none;transition:opacity 0.08s';
+  document.body.appendChild(fl);
+  setTimeout(function(){ fl.style.opacity = '.35'; }, 1450);
+  setTimeout(function(){ fl.style.opacity = '0'; }, 1600);
+  setTimeout(function(){ fl.style.opacity = '.2'; }, 1700);
+  setTimeout(function(){ fl.style.opacity = '0'; document.body.removeChild(fl); }, 1850);
+  setTimeout(function(){
+    document.getElementById('opening').classList.add('hide');
+    setTimeout(function(){
+      document.getElementById('opening').style.display = 'none';
+      document.getElementById('main-container').style.display = 'block';
+    }, 800);
+  }, 2000);
+}
+
+function render() {
+  if (cur >= TOTAL) { showResult(); return; }
+  var q = Q[cur];
+  document.getElementById('q-counter').textContent = '問題 ' + (cur+1) + ' / ' + TOTAL;
+  document.getElementById('score-counter').textContent = cur + ' / ' + TOTAL + ' 回答済';
+  document.getElementById('progress').style.width = (cur/TOTAL*100) + '%';
+  var prevAns = ans[cur];
+  var opts = '';
+  for (var i = 0; i < q.o.length; i++) {
+    var sel = prevAns === i;
+    opts += '<button class="option-btn" onclick="choose(' + i + ')" style="' + (sel ? 'border-color:var(--gold);background:rgba(201,168,76,0.12);' : '') + '">'
+      + '<span class="option-label" style="' + (sel ? 'background:var(--gold);color:#000;' : '') + '">' + LABELS[i] + '</span>'
+      + '<span>' + q.o[i] + '</span></button>';
+  }
+  var backBtn = cur > 0 ? '<div style="margin-top:1.25rem;"><button onclick="goBack()" style="background:transparent;border:1px solid var(--border);border-radius:6px;padding:8px 18px;color:var(--text-muted);font-size:13px;cursor:pointer;">← 前の問題に戻る</button></div>' : '';
+  document.getElementById('main-area').innerHTML =
+    '<div class="question-card">'
+    + '<div class="chara-wrap"><span style="font-size:52px;animation:sway 2s ease-in-out infinite;display:inline-block;transform-origin:bottom center;">✊️</span></div>'
+    + '<div style="margin-bottom:1rem;"><span class="section-tag">' + q.s + '</span><span class="difficulty-tag ' + diffClass[q.d] + '">' + diffLabel[q.d] + '</span></div>'
+    + '<div class="q-num">Q' + (cur+1) + '</div>'
+    + '<div class="q-text">' + q.q + '</div>'
+    + '<div class="options">' + opts + '</div>'
+    + backBtn
+    + '</div>';
+}
+
+function choose(i) {
+  var isNew = ans[cur] === undefined;
+  if (ans[cur] === Q[cur].a && i !== Q[cur].a) score--;
+  if (ans[cur] !== Q[cur].a && i === Q[cur].a) score++;
+  ans[cur] = i;
+  cur++;
+  if (cur === HALFWAY && isNew) { showHalfway(); return; }
+  render();
+}
+
+function goBack() {
+  if (cur > 0) { cur--; render(); }
+}
+
+function showHalfway() {
+  document.getElementById('q-counter').textContent = '問題 ' + HALFWAY + ' / ' + TOTAL + ' 完了';
+  document.getElementById('score-counter').textContent = cur + ' / ' + TOTAL + ' 回答済';
+  document.getElementById('progress').style.width = (HALFWAY/TOTAL*100) + '%';
+  document.getElementById('main-area').innerHTML =
+    '<div class="question-card" style="text-align:center;padding:2.5rem 1.75rem;">'
+    + '<div style="font-size:52px;margin-bottom:1rem;">💪</div>'
+    + '<div style="font-family:\'Noto Serif JP\',serif;font-size:20px;font-weight:700;color:var(--gold-light);margin-bottom:0.75rem;">あと残り15問です。</div>'
+    + '<div style="font-size:15px;color:var(--text-muted);margin-bottom:2rem;">頑張って！</div>'
+    + '<button class="retry-btn" onclick="render()" style="padding:12px 40px;font-size:15px;">▶ 続ける</button>'
+    + '</div>';
+}
+
+function launchFireworks(count) {
+  var canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:999;';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  var particles = [];
+  var colors = ['#C9A84C','#E8C97A','#FF6B6B','#FFD700','#FF69B4','#00FFFF','#FFFFFF','#FF4500','#7EC898'];
+  for (var i = 0; i < count; i++) {
+    (function(idx) {
+      setTimeout(function() {
+        var x = Math.random()*canvas.width, y = Math.random()*canvas.height*0.6;
+        for (var j = 0; j < 80; j++) {
+          var angle = Math.random()*Math.PI*2, speed = Math.random()*6+2;
+          particles.push({x:x,y:y,vx:Math.cos(angle)*speed,vy:Math.sin(angle)*speed,alpha:1,color:colors[Math.floor(Math.random()*colors.length)],size:Math.random()*3+1,gravity:0.12});
+        }
+      }, idx*(count>8?200:400));
+    })(i);
+  }
+  var frame = 0;
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    for (var i = particles.length-1; i >= 0; i--) {
+      var p = particles[i];
+      p.x+=p.vx; p.y+=p.vy; p.vy+=p.gravity; p.alpha-=0.012; p.vx*=0.98;
+      if (p.alpha <= 0) { particles.splice(i,1); continue; }
+      ctx.globalAlpha = p.alpha; ctx.fillStyle = p.color;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.size,0,Math.PI*2); ctx.fill();
+    }
+    ctx.globalAlpha = 1; frame++;
+    if (frame < 300 || particles.length > 0) requestAnimationFrame(animate);
+    else document.body.removeChild(canvas);
+  }
+  animate();
+}
+
+function launchConfetti(density) {
+  var canvas = document.createElement('canvas');
+  canvas.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:998;';
+  document.body.appendChild(canvas);
+  var ctx = canvas.getContext('2d');
+  canvas.width = window.innerWidth; canvas.height = window.innerHeight;
+  var pieces = [];
+  var colors = ['#C9A84C','#E8C97A','#FFD700','#FF6B6B','#FF69B4','#FFFFFF','#7EC898','#00BFFF'];
+  for (var i = 0; i < density; i++) {
+    pieces.push({x:Math.random()*canvas.width,y:-20-Math.random()*200,w:Math.random()*10+5,h:Math.random()*6+3,color:colors[Math.floor(Math.random()*colors.length)],vx:(Math.random()-0.5)*4,vy:Math.random()*3+2,rot:Math.random()*360,rotV:(Math.random()-0.5)*8,alpha:1});
+  }
+  var frame = 0;
+  function animate() {
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    var alive = 0;
+    for (var i = 0; i < pieces.length; i++) {
+      var p = pieces[i];
+      p.x+=p.vx; p.y+=p.vy; p.rot+=p.rotV;
+      if (p.y > canvas.height*0.85) p.alpha -= 0.02;
+      if (p.alpha <= 0) continue;
+      alive++;
+      ctx.save(); ctx.globalAlpha=p.alpha; ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+    }
+    frame++;
+    if (frame < 400 || alive > 0) requestAnimationFrame(animate);
+    else document.body.removeChild(canvas);
+  }
+  animate();
+}
+
+function triggerEffects(isPerfect, isPass) {
+  if (isPerfect) {
+    launchConfetti(320); launchFireworks(15);
+    setTimeout(function(){ launchConfetti(200); }, 1500);
+    setTimeout(function(){ launchFireworks(8); }, 3000);
+  } else if (isPass) {
+    launchConfetti(120); launchFireworks(3);
+  }
+}
+
+function sendToSlack(name, period, score, total, isPass, isPerfect) {
+  var now = new Date();
+  var dateStr = now.getFullYear() + '/' + (now.getMonth()+1) + '/' + now.getDate() + ' ' + now.getHours() + ':' + String(now.getMinutes()).padStart(2,'0');
+  var result = isPerfect ? '満点マイスター認定' : isPass ? 'マイスター認定（合格）' : '不合格';
+  var pct = Math.round(score/total*100);
+  var details = '';
+  for (var i = 0; i < Q.length; i++) {
+    var ok = ans[i] === Q[i].a;
+    details += (ok ? 'O' : 'X') + ' Q' + (i+1) + ' ' + Q[i].s + ' → ' + (ok ? '正解' : '不正解（正解：' + LABELS[Q[i].a] + '. ' + Q[i].o[Q[i].a] + '）') + '\n';
+  }
+  var text = '━━━━━━━━━━━━━━━━\n'
+    + '*たむ小カードゲーム ゲームマスター認定試験*\n'
+    + '━━━━━━━━━━━━━━━━\n'
+    + '名前：' + name + '\n'
+    + '期：' + period + '期\n'
+    + 'スコア：' + score + ' / ' + total + '問（' + pct + '%）\n'
+    + '結果：' + result + '\n'
+    + '日時：' + dateStr + '\n'
+    + '━━━━━━━━━━━━━━━━\n'
+    + '*全問結果*\n'
+    + details
+    + '━━━━━━━━━━━━━━━━';
+  fetch(SLACK_WEBHOOK, {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({text: text})
+  }).catch(function(){});
+}
+
+function showResult() {
+  var pct = Math.round(score/TOTAL*100);
+  var isPerfect = score === TOTAL;
+  var isPass = score >= PASS;
+  var need = PASS - score;
+  var bannerHTML = '';
+  if (isPerfect) {
+    bannerHTML = '<div class="banner-perfect"><div class="b-icon">🏅</div><div class="b-title">おめでとう！満点達成！<br>あなたをたむ小カードゲーム<br>満点マイスターに認定します！</div><div class="b-sub">— PERFECT SCORE MEISTER —</div><div style="margin-top:0.75rem;font-size:14px;color:var(--gold-light);font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
+  } else if (isPass) {
+    bannerHTML = '<div class="banner-pass"><div class="b-icon">🏅</div><div class="b-title">合格おめでとう！<br>あなたをたむ小カードゲーム<br>マイスターに認定します！</div><div class="b-sub">— CARD GAME MEISTER 認定 —</div><div style="margin-top:0.75rem;font-size:14px;color:#7EC898;font-family:Noto Serif JP,serif;">校長からマイスターバッチを受け取ってください</div></div>';
+  } else {
+    bannerHTML = '<div class="banner-fail"><div class="b-icon">😔</div><div class="b-title">不合格</div><div class="b-sub">合格ライン：' + PASS + '問正解 / あなたの結果：' + score + '問正解</div><div class="b-remain">あと ' + need + ' 問正解で合格！</div></div>';
+  }
+  var review = '';
+  for (var i = 0; i < Q.length; i++) {
+    var q = Q[i];
+    var ok = ans[i] === q.a;
+    review += '<div class="review-item ' + (ok?'ok':'ng') + '">'
+      + '<div class="review-header"><span class="review-badge ' + (ok?'ok':'ng') + '">' + (ok?'正解':'不正解') + '</span>'
+      + '<span style="font-size:11px;color:var(--text-muted)">Q' + (i+1) + ' · ' + q.s + ' · <span class="difficulty-tag ' + diffClass[q.d] + '" style="font-size:9px;">' + diffLabel[q.d] + '</span></span></div>'
+      + '<div class="review-qtext">' + q.q + '</div>'
+      + ((!ok) ? '<div class="review-ans">あなたの回答: ' + (ans[i]===undefined?'未回答':LABELS[ans[i]]+'. '+q.o[ans[i]]) + '</div>' : '')
+      + '<div class="review-ans">正解: ' + LABELS[q.a] + '. ' + q.o[q.a] + '</div>'
+      + '<div class="review-exp">' + q.e + '</div></div>';
+  }
+  document.getElementById('q-counter').textContent = '試験完了';
+  document.getElementById('score-counter').textContent = '正解: ' + score + ' / ' + TOTAL;
+  document.getElementById('progress').style.width = '100%';
+  document.getElementById('main-area').innerHTML =
+    '<div class="result-card">'
+    + '<div class="result-eyebrow">RESULT — ' + userName + 'さん（' + userPeriod + '期）</div>'
+    + bannerHTML
+    + '<div class="ornament" style="margin-bottom:1.5rem"><div class="ornament-line"></div><div class="ornament-diamond"></div><div class="ornament-line rev"></div></div>'
+    + '<div class="result-score">' + score + '<span class="result-total"> / ' + TOTAL + '</span></div>'
+    + '<div class="result-pct">正解率 ' + pct + '%</div>'
+    + '<div class="review-list">' + review + '</div>'
+    + '<button class="retry-btn" style="margin-top:2rem;" onclick="restart()">もう一度挑戦する</button>'
+    + '</div>';
+  if (isPerfect || isPass) setTimeout(function(){ triggerEffects(isPerfect, isPass); }, 300);
+  sendToSlack(userName, userPeriod, score, TOTAL, isPass, isPerfect);
+}
+
+function restart() {
+  cur = 0; score = 0; ans = [];
+  document.getElementById('opening').style.display = 'flex';
+  document.getElementById('main-container').style.display = 'none';
+  document.getElementById('opening').classList.remove('hide');
+  document.getElementById('name-input').value = '';
+  document.getElementById('period-input').value = '';
+  document.getElementById('start-btn').disabled = true;
+}
+
+render();
+</script>
+</body>
+</html>
